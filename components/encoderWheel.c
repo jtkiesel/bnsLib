@@ -12,25 +12,25 @@ typedef struct {
 	bool inverted;
 } EncoderWheel;
 
-static const tSensors kDefaultPort = (tSensors)-1;
-static const float kDefaultPulsesPerRev = -1.0;
-static const float kDefaultWheelDiamter = -1.0;
-static const float kDefaultGearRatio = 1.0;
-static const float kDefaultSlipFactor = 1.0;
-static const bool kDefaultInverted = false;
+const tSensors kDefaultPort = (tSensors)-1;
+const float kDefaultPulsesPerRev = -1.0;
+const float kDefaultWheelDiamter = -1.0;
+const float kDefaultGearRatio = 1.0;
+const float kDefaultSlipFactor = 1.0;
+const bool kDefaultInverted = false;
 
-static const tSensors kMinInPort = in1;
-static const tSensors kMaxInPort = in8;
-static const tSensors kMinDgtlPort = dgtl1;
-static const tSensors kMaxDgtlPort = dgtl12;
-static const tSensors kMinI2cPort = I2C_1;
-static const tSensors kMaxI2cPort = I2C_8;
-static const string kInPortString = "in";
-static const string kDgtlPortString = "dgtl";
-static const string kI2cPortString = "I2C_";
+const tSensors kMinInPort = in1;
+const tSensors kMaxInPort = in8;
+const tSensors kMinDgtlPort = dgtl1;
+const tSensors kMaxDgtlPort = dgtl12;
+const tSensors kMinI2cPort = I2C_1;
+const tSensors kMaxI2cPort = I2C_8;
+const string kInPortString = "in";
+const string kDgtlPortString = "dgtl";
+const string kI2cPortString = "I2C_";
 
-static const string kTrueString = "true";
-static const string kFalseString = "false";
+const string kTrueString = "true";
+const string kFalseString = "false";
 
 EncoderWheel *newEncoderWheel(EncoderWheel *this, tSensors port,
 		float pulsesPerRev, float wheelDiameter, float gearRatio, float slipFactor,
@@ -71,7 +71,7 @@ EncoderWheel *newEncoderWheel(EncoderWheel *this, tSensors port,
 }
 
 EncoderWheel *newEncoderWheel(EncoderWheel *this, tSensors port,
-		float pulsesPerRev, float wheelDiamter, bool inverted) {
+		float pulsesPerRev, float wheelDiamter) {
 	return newEncoderWheel(this, port, pulsesPerRev, wheelDiamter,
 			kDefaultGearRatio, kDefaultSlipFactor, kDefaultInverted);
 }
@@ -83,7 +83,7 @@ EncoderWheel *newEncoderWheel(EncoderWheel *this) {
 }
 
 tSensors getPort(EncoderWheel *this) {
-	return this ? this->port : -1;
+	return this ? this->port : kDefaultPort;
 }
 
 EncoderWheel *setPort(EncoderWheel *this, tSensors port) {
@@ -94,7 +94,7 @@ EncoderWheel *setPort(EncoderWheel *this, tSensors port) {
 }
 
 float getPulsesPerRev(EncoderWheel *this) {
-	return this ? this->pulsesPerRev : 0.0;
+	return this ? this->pulsesPerRev : kDefaultPulsesPerRev;
 }
 
 EncoderWheel *setPulsesPerRev(EncoderWheel *this, float pulsesPerRev) {
