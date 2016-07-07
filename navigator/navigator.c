@@ -3,7 +3,7 @@
 #if !defined(NAVIGATOR_C_)
 #define NAVIGATOR_C_
 
-#include "../bnsMath/bnsMath.c"
+#include "../util/bnsMath.c"
 #include "../components/encoderWheel.c"
 
 typedef struct {
@@ -69,13 +69,13 @@ Navigator *updateNavigator(Navigator *this) {
 		float diffM = getDistance(this->middleEncoder) - this->lastM;
 
 		float diffH = (diffR - diffL) / this->driveWidth;
-		float tempHeading = this->heading + (diffH / 2.0);
+		float tempHeading = this->heading + diffH / 2.0;
 		float magnitude = (diffL + diffR) / 2.0;
 
 		semaphoreLock(this->sem);
 
-		this->x += (magnitude * sin(tempHeading)) + (diffM * cos(tempHeading));
-		this->y += (magnitude * cos(tempHeading)) + (diffM * sin(tempHeading));
+		this->x += magnitude * sin(tempHeading) + diffM * cos(tempHeading);
+		this->y += magnitude * cos(tempHeading) + diffM * sin(tempHeading);
 		this->heading = boundAngle0to2PiRadians(this->heading + diffH);
 
 		if (bDoesTaskOwnSemaphore(this->sem)) {
@@ -167,7 +167,7 @@ Navigator *setY(Navigator *this, float y) {
 }
 
 float getHeading(Navigator *this) {
-	return this ? this->heading : NULL;
+	return this ? this->heading : 0.0;
 }
 
 Navigator *setHeading(Navigator *this, float heading) {
@@ -183,7 +183,7 @@ Navigator *setHeading(Navigator *this, float heading) {
 	return this;
 }
 
-Navigator *printNavigator(Navigator *this) {
+Navigator *print(Navigator *this) {
 	if (this) {
 		writeDebugStream("Drive Width: %d\n", this->driveWidth);
 		writeDebugStream("x: %f\n", this->x);
