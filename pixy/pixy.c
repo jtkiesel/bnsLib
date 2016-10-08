@@ -4,22 +4,22 @@
 #define PIXY_C_
 
 // Communication/miscellaneous parameters.
-#define PIXY_ARRAY_SIZE    		30
-#define PIXY_START_WORD    		0xaa55
-#define PIXY_START_WORD_CC 		0xaa56
-#define PIXY_START_WORDX   		0x55aa
-#define PIXY_MAX_SIGNATURE 		7
+#define PIXY_ARRAY_SIZE     	30
+#define PIXY_START_WORD     	0xaa55
+#define PIXY_START_WORD_CC  	0xaa56
+#define PIXY_START_WORDX    	0x55aa
+#define PIXY_MAX_SIGNATURE  	7
 
 // Pixy x-y position values.
-#define PIXY_MIN_X         		0
-#define PIXY_MAX_X         		319
-#define PIXY_MIN_Y         		0
-#define PIXY_MAX_Y         		199
+#define PIXY_MIN_X          	0
+#define PIXY_MAX_X          	319
+#define PIXY_MIN_Y          	0
+#define PIXY_MAX_Y          	199
 
 // RC-servo values.
-#define PIXY_RCS_MIN_POS   		0
-#define PIXY_RCS_MAX_POS   		1000
-#define PIXY_RCS_CENTER_POS		((PIXY_RCS_MAX_POS - PIXY_RCS_MIN_POS) / 2)
+#define PIXY_RCS_MIN_POS    	0
+#define PIXY_RCS_MAX_POS    	1000
+#define PIXY_RCS_CENTER_POS 	((PIXY_RCS_MAX_POS - PIXY_RCS_MIN_POS) / 2)
 
 #include "../communication/uart.c"
 

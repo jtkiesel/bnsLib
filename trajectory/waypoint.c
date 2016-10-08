@@ -17,6 +17,7 @@ Waypoint *newWaypoint(Waypoint *this, float x, float y, float theta,
 		this->x = x;
 		this->y = y;
 		this->theta = theta;
+
 		this->next = next;
 	}
 	return this;

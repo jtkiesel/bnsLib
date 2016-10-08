@@ -66,11 +66,11 @@ float boundAngleNegPiToPiRadians(float angle) {
 /**
  * Get the difference in angle between two angles.
  *
- * @param		from	The first angle.
- * @param		to		The second angle.
+ * @param 	from	The first angle.
+ * @param 	to  	The second angle.
  *
  * @return	The change in angle from the first argument necessary to line up
- * 					with the second. Always between -Pi and Pi.
+ *        	with the second. Always between -Pi and Pi.
  */
 float getDifferenceInAngleRadians(float from, float to) {
 	return boundAngleNegPiToPiRadians(to - from);
@@ -78,6 +78,11 @@ float getDifferenceInAngleRadians(float from, float to) {
 
 /**
  * Limits the given input to the given magnitude.
+ *
+ * @param 	v    	The value to limit.
+ * @param 	limit	The magnitude to limit to.
+ *
+ * @return	The limited value.
  */
 float limit(float v, float limit) {
 	return (fabs(v) < limit) ? v : sgn(v) * limit;

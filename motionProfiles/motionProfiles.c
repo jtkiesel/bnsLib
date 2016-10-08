@@ -24,18 +24,21 @@ MotionProfile *newMotionProfile(MotionProfile *this, float maxVel,
 }
 
 float update(MotionProfile *this, float error, float t) {
-  // Find target velocity based on time (acceleration).
-  float v = this->v0 + this->maxAcc * t;  // v = v0 + a*t
-  // Keep target velocity within its limit.
-  if (v > this->maxVel) {
-    v = sgn(v) * this->maxVel;
-  }
-  // If it is time to decelerate (use v1 in place of v0 to decelerate).
-  if (error <= (pow(v, 2) - pow(this->v1, 2)) / (2 * this->maxAcc)) {  // ds = (v^2 - v0^2)/(2*a) derived from v^2 = v0^2 + 2*a*ds
-    // Find velocity based on error (deceleration).
-    v = sgn(this->maxAcc * error) * sqrt(fabs(pow(this->v1, 2) + 2 * this->maxAcc * error));  // v = sqrt(v0^2 + 2*a*ds) derived from v^2 = v0^2 + 2*a*ds
-  }
-  return v;  // Return target velocity.
+	// Find target velocity based on time (acceleration).
+	float v = this->v0 + this->maxAcc * t;  // v = v0 + a*t
+	// Keep target velocity within its limit.
+	if (v > this->maxVel) {
+		v = sgn(v) * this->maxVel;
+	}
+	// If it is time to decelerate (use v1 in place of v0 to decelerate).
+	// ds = (v^2 - v0^2) / (2*a) derived from v^2 = v0^2 + 2*a*ds.
+	if (error <= (pow(v, 2) - pow(this->v1, 2)) / (2 * this->maxAcc)) {
+		// Find velocity based on error (deceleration).
+		// v = sqrt(v0^2 + 2*a*ds) derived from v^2 = v0^2 + 2*a*ds.
+		v = sgn(this->maxAcc * error) * sqrt(fabs(pow(this->v1, 2)
+				+ 2 * this->maxAcc * error));
+	}
+	return v;  // Return target velocity.
 }
 
 #endif  // MOTION_PROFILE_C_

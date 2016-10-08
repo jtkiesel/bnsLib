@@ -7,22 +7,22 @@
 #include "../components/encoderWheel.c"
 
 typedef struct {
-  EncoderWheel *leftEncoder;
-  EncoderWheel *rightEncoder;
-  EncoderWheel *middleEncoder;
-  float driveWidth;
-  float x;
-  float y;
-  float heading;
-  float lastL;
-  float lastR;
-  float lastM;
-  TSemaphore sem;
+	EncoderWheel *leftEncoder;
+	EncoderWheel *rightEncoder;
+	EncoderWheel *middleEncoder;
+	float driveWidth;
+	float x;
+	float y;
+	float heading;
+	float lastL;
+	float lastR;
+	float lastM;
+	TSemaphore sem;
 } Navigator;
 
 Navigator *newNavigator(Navigator *this, EncoderWheel *leftEncoder,
-		EncoderWheel *rightEncoder, EncoderWheel *middleEncoder, float driveWidth,
-		float x, float y, float heading) {
+		EncoderWheel *rightEncoder, EncoderWheel *middleEncoder,
+		float driveWidth, float x, float y, float heading) {
 	if (this) {
 		this->leftEncoder = leftEncoder;
 		this->rightEncoder = rightEncoder;
@@ -40,7 +40,8 @@ Navigator *newNavigator(Navigator *this, EncoderWheel *leftEncoder,
 }
 
 Navigator *newNavigator(Navigator *this, EncoderWheel *leftEncoder,
-		EncoderWheel *rightEncoder, EncoderWheel *middleEncoder, float driveWidth) {
+		EncoderWheel *rightEncoder, EncoderWheel *middleEncoder,
+		float driveWidth) {
 	return newNavigator(this, leftEncoder, rightEncoder, middleEncoder,
 			driveWidth, 0.0, 0.0, 0.0);
 }

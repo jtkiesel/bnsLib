@@ -10,7 +10,8 @@ typedef struct {
 	Waypoint *tail;
 } WaypointSequence;
 
-WaypointSequence *newWaypointSequence(WaypointSequence *this, Waypoint *head, Waypoint *tail) {
+WaypointSequence *newWaypointSequence(WaypointSequence *this, Waypoint *head,
+		Waypoint *tail) {
 	if (this) {
 		this->head = head;
 		this->tail = tail;
@@ -19,10 +20,11 @@ WaypointSequence *newWaypointSequence(WaypointSequence *this, Waypoint *head, Wa
 }
 
 WaypointSequence *newWaypointSequence(WaypointSequence *this, Waypoint *head) {
-	if (this) {
+	if (this || head) {
 		Waypoint *current = head;
 
-		while (current->next) {  // Find tail.
+		// Find tail.
+		while (current->next) {
 			current = current->next;
 		}
 		this->head = head;

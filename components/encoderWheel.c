@@ -19,71 +19,60 @@ const float kDefaultGearRatio = 1.0;
 const float kDefaultSlipFactor = 1.0;
 const bool kDefaultInverted = false;
 
-const tSensors kMinInPort = in1;
-const tSensors kMaxInPort = in8;
-const tSensors kMinDgtlPort = dgtl1;
-const tSensors kMaxDgtlPort = dgtl12;
-const tSensors kMinI2cPort = I2C_1;
-const tSensors kMaxI2cPort = I2C_8;
-const string kInPortString = "in";
-const string kDgtlPortString = "dgtl";
-const string kI2cPortString = "I2C_";
-
-const string kTrueString = "true";
-const string kFalseString = "false";
-
 EncoderWheel *newEncoderWheel(EncoderWheel *this, tSensors port,
-		float pulsesPerRev, float wheelDiameter, float gearRatio, float slipFactor,
-		bool inverted) {
-	if (this) {
-		this->port = port;
-		this->pulsesPerRev = pulsesPerRev;
-		this->wheelDiameter = wheelDiameter;
-		this->gearRatio = gearRatio;
-		this->slipFactor = slipFactor;
-		this->inverted = inverted;
+		float pulsesPerRev, float wheelDiameter, float gearRatio,
+		float slipFactor, bool inverted) {
+	if (this == NULL) {
+		return NULL;
 	}
+	this->port = port;
+	this->pulsesPerRev = pulsesPerRev;
+	this->wheelDiameter = wheelDiameter;
+	this->gearRatio = gearRatio;
+	this->slipFactor = slipFactor;
+	this->inverted = inverted;
+
 	return this;
 }
 
 EncoderWheel *newEncoderWheel(EncoderWheel *this, tSensors port,
-		float pulsesPerRev, float wheelDiamter, float gearRatio, float slipFactor) {
+		float pulsesPerRev, float wheelDiamter, float gearRatio,
+		float slipFactor) {
 	return newEncoderWheel(this, port, pulsesPerRev, wheelDiamter, gearRatio,
-			slipFactor, kDefaultInverted);
+			slipFactor, false);
 }
 
 EncoderWheel *newEncoderWheel(EncoderWheel *this, tSensors port,
-		float pulsesPerRev, float wheelDiamter, float gearRatio, bool inverted) {
+		float pulsesPerRev, float wheelDiamter, float gearRatio,
+		bool inverted) {
 	return newEncoderWheel(this, port, pulsesPerRev, wheelDiamter, gearRatio,
-			kDefaultSlipFactor, inverted);
+			1.0, inverted);
 }
 
 EncoderWheel *newEncoderWheel(EncoderWheel *this, tSensors port,
 		float pulsesPerRev, float wheelDiamter, float gearRatio) {
 	return newEncoderWheel(this, port, pulsesPerRev, wheelDiamter, gearRatio,
-			kDefaultSlipFactor, kDefaultInverted);
+			1.0, false);
 }
 
 EncoderWheel *newEncoderWheel(EncoderWheel *this, tSensors port,
 		float pulsesPerRev, float wheelDiamter, bool inverted) {
-	return newEncoderWheel(this, port, pulsesPerRev, wheelDiamter,
-			kDefaultGearRatio, kDefaultSlipFactor, inverted);
+	return newEncoderWheel(this, port, pulsesPerRev, wheelDiamter, 1.0, 1.0,
+			inverted);
 }
 
 EncoderWheel *newEncoderWheel(EncoderWheel *this, tSensors port,
 		float pulsesPerRev, float wheelDiamter) {
-	return newEncoderWheel(this, port, pulsesPerRev, wheelDiamter,
-			kDefaultGearRatio, kDefaultSlipFactor, kDefaultInverted);
+	return newEncoderWheel(this, port, pulsesPerRev, wheelDiamter, 1.0, 1.0,
+			false);
 }
 
 EncoderWheel *newEncoderWheel(EncoderWheel *this) {
-	return newEncoderWheel(this, kDefaultPort, kDefaultPulsesPerRev,
-			kDefaultWheelDiamter, kDefaultGearRatio, kDefaultSlipFactor,
-			kDefaultInverted);
+	return newEncoderWheel(this, (tSensors)-1, 0.0, 0.0, 1.0, 1.0, false);
 }
 
 tSensors getPort(EncoderWheel *this) {
-	return this ? this->port : kDefaultPort;
+	return this ? this->port : (tSensors)-1;
 }
 
 EncoderWheel *setPort(EncoderWheel *this, tSensors port) {
@@ -94,7 +83,7 @@ EncoderWheel *setPort(EncoderWheel *this, tSensors port) {
 }
 
 float getPulsesPerRev(EncoderWheel *this) {
-	return this ? this->pulsesPerRev : kDefaultPulsesPerRev;
+	return this ? this->pulsesPerRev : 0.0;
 }
 
 EncoderWheel *setPulsesPerRev(EncoderWheel *this, float pulsesPerRev) {
@@ -105,7 +94,7 @@ EncoderWheel *setPulsesPerRev(EncoderWheel *this, float pulsesPerRev) {
 }
 
 float getWheelDiameter(EncoderWheel *this) {
-	return this ? this->wheelDiameter : kDefaultWheelDiamter;
+	return this ? this->wheelDiameter : 0.0;
 }
 
 EncoderWheel *setWheelDiameter(EncoderWheel *this, float wheelDiameter) {
@@ -116,7 +105,7 @@ EncoderWheel *setWheelDiameter(EncoderWheel *this, float wheelDiameter) {
 }
 
 float getGearRatio(EncoderWheel *this) {
-	return this ? this->gearRatio : kDefaultGearRatio;
+	return this ? this->gearRatio : 1.0;
 }
 
 EncoderWheel *setGearRatio(EncoderWheel *this, float gearRatio) {
@@ -127,7 +116,7 @@ EncoderWheel *setGearRatio(EncoderWheel *this, float gearRatio) {
 }
 
 float getSlipFactor(EncoderWheel *this) {
-	return this ? this->slipFactor : kDefaultSlipFactor;
+	return this ? this->slipFactor : 1.0;
 }
 
 EncoderWheel *setSlipFactor(EncoderWheel *this, float  slipFactor) {
@@ -138,7 +127,7 @@ EncoderWheel *setSlipFactor(EncoderWheel *this, float  slipFactor) {
 }
 
 bool getInverted(EncoderWheel *this) {
-	return this ? this->inverted : kDefaultInverted;
+	return this ? this->inverted : false;
 }
 
 EncoderWheel *setInverted(EncoderWheel *this, bool inverted) {
@@ -149,50 +138,50 @@ EncoderWheel *setInverted(EncoderWheel *this, bool inverted) {
 }
 
 long getPulses(EncoderWheel *this) {
-	long pulses = 0;
-
-	if (this) {
-		pulses = (this->inverted ? -1 : 1) * SensorValue[this->port];
+	if (this == NULL) {
+		return 0;
 	}
-	return pulses;
+	return (this->inverted ? -1 : 1) * SensorValue[this->port];
 }
 
 float getDistance(EncoderWheel *this) {
-	float distance = 0.0;
-
-	if (this) {
-		distance = ((this->inverted ? -1.0 : 1.0) * SensorValue[this->port] * PI
-				* this->wheelDiameter) / (this->pulsesPerRev * this->gearRatio
-				* this->slipFactor);
+	if (this == NULL) {
+		return 0.0;
 	}
-	return distance;
+	return ((this->inverted ? -1.0 : 1.0) * SensorValue[this->port] * PI
+			* this->wheelDiameter) / (this->pulsesPerRev * this->gearRatio
+			* this->slipFactor);
 }
 
-void print(EncoderWheel *this) {
-	if (this) {
-		string portString = "", invertedString;
-		tSensors port = this->port;
-
-		if (port >= kMinInPort && port <= kMaxInPort) {
-			portString = kInPortString;
-			port -= kMinInPort - 1;
-		} else if (port >= kMinDgtlPort && port <= kMaxDgtlPort) {
-			portString = kDgtlPortString;
-			port -= kMinDgtlPort - 1;
-		} else if (port >= kMinI2cPort && port <= kMaxI2cPort) {
-			portString = kI2cPortString;
-			port -= kMinI2cPort - 1;
-		}
-		invertedString = this->inverted ? kTrueString : kFalseString;
-
-		writeDebugStream("Port: %s%d\n", portString, port);
-		writeDebugStream("Pulses Per Rev: %f\n", this->pulsesPerRev);
-		writeDebugStream("Wheel Diameter: %f\n", this->wheelDiameter);
-		writeDebugStream("Gear Ratio: %f\n", this->gearRatio);
-		writeDebugStream("Slip Factor: %f\n", this->slipFactor);
-		writeDebugStream("Inverted: %s\n", invertedString);
-		writeDebugStream("Distance: %f\n", getDistance(this));
+EncoderWheel *print(EncoderWheel *this) {
+	if (this == NULL) {
+		return NULL;
 	}
+	char *portString;
+	char *invertedString;
+	tSensors port = this->port;
+
+	if (port >= in1 && port <= in8) {
+		portString = "in";
+		port -= in1 - 1;
+	} else if (port >= dgtl1 && port <= dgtl12) {
+		portString = "dgtl";
+		port -= dgtl1 - 1;
+	} else if (port >= I2C_1 && port <= I2C_8) {
+		portString = "I2C_;
+		port -= I2C_1 - 1;
+	}
+	invertedString = this->inverted ? "true" : "false";
+
+	writeDebugStream("Port: %s%d\n", portString, port);
+	writeDebugStream("Pulses Per Rev: %f\n", this->pulsesPerRev);
+	writeDebugStream("Wheel Diameter: %f\n", this->wheelDiameter);
+	writeDebugStream("Gear Ratio: %f\n", this->gearRatio);
+	writeDebugStream("Slip Factor: %f\n", this->slipFactor);
+	writeDebugStream("Inverted: %s\n", invertedString);
+	writeDebugStream("Distance: %f\n", getDistance(this));
+
+	return this;
 }
 
 #endif  // ENCODERWHEEL_C_

@@ -40,8 +40,8 @@ Spline *newSpline(Spline *this, float x0, float y0, float theta0, float x1,
 	// We cannot handle vertical slopes in our rotated, translated basis. This
 	// would mean the user wants to end up 90 degrees off of the straight line
 	// between p0 and p1.
-	if (almostEqual(fabs(theta0Hat), PI / 2.0) ||
-			almostEqual(fabs(theta1Hat), PI / 2.0)) {
+	if (almostEqual(fabs(theta0Hat), PI / 2.0)
+			|| almostEqual(fabs(theta1Hat), PI / 2.0)) {
 		return NULL;
 	}
 	// We also cannot handle the case that the end angle is facing toward the
@@ -68,8 +68,11 @@ Spline *newSpline(Spline *this, Waypoint *beginning, Waypoint *end) {
 }
 
 Spline *print(Spline *this) {
-	writeDebugStream("a=%f; b=%f; c=%f; d=%f; e=%f\n", this->a, this->b, this->c,
-			this->d, this->e);
+	if (this == NULL) {
+		return NULL;
+	}
+	writeDebugStream("a=%f; b=%f; c=%f; d=%f; e=%f\n", this->a, this->b,
+			this->c, this->d, this->e);
 	writeDebugStream("xOffset=%f; yOffset=%f; thetaOffset=%f\n", this->xOffset,
 			this->yOffset, this->thetaOffset);
 
