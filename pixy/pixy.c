@@ -48,22 +48,6 @@ typedef struct {
 /**
  * Initialize Pixy.
  *
- * @param 	this	Pointer to Pixy struct.
- * @param 	port	UART port the Pixy is plugged into.
- *
- * @return	Pointer to Pixy struct.
- */
-Pixy *newPixy(Pixy *this, TUARTs port) {
-	this->port = port;
-	this->skipStart = false;
-	this->blockCount = 0;
-
-	return this;
-}
-
-/**
- * Initialize Pixy.
- *
  * @param 	this    	Pointer to Pixy struct.
  * @param 	port    	UART port the Pixy is plugged into.
  * @param 	baudRate	Baud rate the Pixy is set to use.
@@ -72,12 +56,24 @@ Pixy *newPixy(Pixy *this, TUARTs port) {
  */
 Pixy *newPixy(Pixy *this, TUARTs port, TBaudRate baudRate) {
 	setBaudRate(port, baudRate);
-
+	
 	this->port = port;
 	this->skipStart = false;
 	this->blockCount = 0;
-
+	
 	return this;
+}
+
+/**
+ * Initialize Pixy.
+ *
+ * @param 	this	Pointer to Pixy struct.
+ * @param 	port	UART port the Pixy is plugged into.
+ *
+ * @return	Pointer to Pixy struct.
+ */
+Pixy *newPixy(Pixy *this, TUARTs port) {
+	return newPixy(this, port, baudRate19200);
 }
 
 /**
@@ -115,17 +111,17 @@ bool getPixyStart(Pixy *this) {
  *
  * @param 	this	Pointer to Pixy struct.
  *
- * @return	Pointer to Pixy struct.
+ * @return	Number of blocks found.
  */
-Pixy *update(Pixy *this) {
+unsigned short update(Pixy *this) {
 	TUARTs port = this->port;
 	unsigned short w, blockCount = 0, checksum, sum;
 	PixyBlock *block;
 
 	if (!this->skipStart) {
-		if (getPixyStart(this) == 0) {
+		if (!getPixyStart(this)) {
 			this->blockCount = 0;
-			return this;
+			return 0;
 		}
 	} else {
 		this->skipStart = false;
@@ -190,7 +186,7 @@ Pixy *update(Pixy *this) {
 			break;
 		}
 	}
-	return this;
+	return blockCount;
 }
 
 /**
@@ -233,13 +229,7 @@ short setBrightness(Pixy *this, unsigned char brightness) {
  * @return	Number of characters sent via sendChars().
  */
 short setLED(Pixy *this, unsigned char r, unsigned char g, unsigned char b) {
-	unsigned char outBuf[5];
-
-	outBuf[0] = 0x00;
-	outBuf[1] = 0xfd;
-	outBuf[2] = r;
-	outBuf[3] = g;
-	outBuf[4] = b;
+	unsigned char outBuf[5] = {0x00, 0xfd, r, g, b};
 
 	return sendChars(this->port, outBuf, sizeof(outBuf) / sizeof(outBuf[0]));
 }
@@ -293,7 +283,7 @@ void print(Pixy *this) {
 	writeDebugStream("Detected %d:\n", blockCount);
 
 	for (unsigned short i = 0; i < blockCount; i++) {
-		writeDebugStream("  block %d: ", i);
+		writeDebugStream("\tblock %d: ", i);
 		print(&this->blocks[i]);
 	}
 }
