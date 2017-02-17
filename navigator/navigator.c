@@ -10,13 +10,17 @@ typedef struct {
 	EncoderWheel *leftEncoder;
 	EncoderWheel *rightEncoder;
 	EncoderWheel *middleEncoder;
+
 	float driveWidth;
+
 	float x;
 	float y;
 	float heading;
+
 	float lastL;
 	float lastR;
 	float lastM;
+
 	TSemaphore sem;
 } Navigator;
 
@@ -27,13 +31,17 @@ Navigator *newNavigator(Navigator *this, EncoderWheel *leftEncoder,
 		this->leftEncoder = leftEncoder;
 		this->rightEncoder = rightEncoder;
 		this->middleEncoder = middleEncoder;
+
 		this->driveWidth = driveWidth;
+
 		this->x = x;
 		this->y = y;
 		this->heading = heading;
+
 		this->lastL = getDistance(leftEncoder);
 		this->lastR = getDistance(rightEncoder);
 		this->lastM = getDistance(middleEncoder);
+
 		semaphoreInitialize(this->sem);
 	}
 	return this;
@@ -63,81 +71,51 @@ Navigator *newNavigator(Navigator *this) {
 	return newNavigator(this, NULL, NULL, NULL, 0.0, 0.0, 0.0, 0.0);
 }
 
-Navigator *updateNavigator(Navigator *this) {
-	if (this) {
-		float diffL = getDistance(this->leftEncoder) - this->lastL;
-		float diffR = getDistance(this->rightEncoder) - this->lastR;
-		float diffM = getDistance(this->middleEncoder) - this->lastM;
-
-		float diffH = (diffR - diffL) / this->driveWidth;
-		float tempHeading = this->heading + diffH / 2.0;
-		float magnitude = (diffL + diffR) / 2.0;
-
-		semaphoreLock(this->sem);
-
-		this->x += magnitude * sin(tempHeading) + diffM * cos(tempHeading);
-		this->y += magnitude * cos(tempHeading) + diffM * sin(tempHeading);
-		this->heading = boundAngle0to2PiRadians(this->heading + diffH);
-
-		if (bDoesTaskOwnSemaphore(this->sem)) {
-			semaphoreUnlock(this->sem);
-		}
-		this->lastL += diffL;
-		this->lastR += diffR;
-		this->lastM += diffM;
-	}
-	return this;
-}
-
 EncoderWheel *getLeftEncoder(Navigator *this) {
 	return this ? this->leftEncoder : NULL;
 }
 
-Navigator *setLeftEncoder(Navigator *this, EncoderWheel *leftEncoder) {
+void setLeftEncoder(Navigator *this, EncoderWheel *leftEncoder) {
 	if (this) {
 		this->leftEncoder = leftEncoder;
 	}
-	return this;
 }
 
 EncoderWheel *getRightEncoder(Navigator *this) {
 	return this ? this->rightEncoder : NULL;
 }
 
-Navigator *setRightEncoder(Navigator *this, EncoderWheel *rightEncoder) {
+void setRightEncoder(Navigator *this, EncoderWheel *rightEncoder) {
 	if (this) {
 		this->rightEncoder = rightEncoder;
 	}
-	return this;
 }
 
 EncoderWheel *getMiddleEncoder(Navigator *this) {
 	return this ? this->middleEncoder : NULL;
 }
 
-Navigator *setMiddleEncoder(Navigator *this, EncoderWheel *middleEncoder) {
+void setMiddleEncoder(Navigator *this, EncoderWheel *middleEncoder) {
 	if (this) {
 		this->middleEncoder = middleEncoder;
 	}
-	return this;
 }
 
 float getDriveWidth(Navigator *this) {
 	return this ? this->driveWidth : 0.0;
 }
 
-Navigator *setDriveWidth(Navigator *this, float driveWidth) {
+void setDriveWidth(Navigator *this, float driveWidth) {
 	if (this) {
 		this->driveWidth = driveWidth;
 	}
-	return this;
 }
 
 float getX(Navigator *this) {
 	return this ? this->x : 0.0;
 }
 
-Navigator *setX(Navigator *this, float x) {
+void setX(Navigator *this, float x) {
 	if (this) {
 		semaphoreLock(this->sem);
 
@@ -147,14 +125,13 @@ Navigator *setX(Navigator *this, float x) {
 			semaphoreUnlock(this->sem);
 		}
 	}
-	return this;
 }
 
 float getY(Navigator *this) {
 	return this ? this->y : 0.0;
 }
 
-Navigator *setY(Navigator *this, float y) {
+void setY(Navigator *this, float y) {
 	if (this) {
 		semaphoreLock(this->sem);
 
@@ -164,14 +141,13 @@ Navigator *setY(Navigator *this, float y) {
 			semaphoreUnlock(this->sem);
 		}
 	}
-	return this;
 }
 
 float getHeading(Navigator *this) {
 	return this ? this->heading : 0.0;
 }
 
-Navigator *setHeading(Navigator *this, float heading) {
+void setHeading(Navigator *this, float heading) {
 	if (this) {
 		semaphoreLock(this->sem);
 
@@ -181,17 +157,41 @@ Navigator *setHeading(Navigator *this, float heading) {
 			semaphoreUnlock(this->sem);
 		}
 	}
-	return this;
 }
 
-Navigator *print(Navigator *this) {
+void update(Navigator *this) {
+	if (this == NULL) {
+		return;
+	}
+	float diffL = getDistance(this->leftEncoder) - this->lastL;
+	float diffR = getDistance(this->rightEncoder) - this->lastR;
+	float diffM = getDistance(this->middleEncoder) - this->lastM;
+
+	float diffH = (diffR - diffL) / this->driveWidth;
+	float tempHeading = this->heading + diffH / 2.0;
+	float magnitude = (diffL + diffR) / 2.0;
+
+	semaphoreLock(this->sem);
+
+	this->x += magnitude * sin(tempHeading) + diffM * cos(tempHeading);
+	this->y += magnitude * cos(tempHeading) + diffM * sin(tempHeading);
+	this->heading = boundAngle0to2PiRadians(this->heading + diffH);
+
+	if (bDoesTaskOwnSemaphore(this->sem)) {
+		semaphoreUnlock(this->sem);
+	}
+	this->lastL += diffL;
+	this->lastR += diffR;
+	this->lastM += diffM;
+}
+
+void print(Navigator *this) {
 	if (this) {
 		writeDebugStream("Drive Width: %d\n", this->driveWidth);
 		writeDebugStream("x: %f\n", this->x);
 		writeDebugStream("y: %f\n", this->y);
 		writeDebugStream("Heading: %f\n", this->heading);
 	}
-	return this;
 }
 
 #endif  // NAVIGATOR_C_

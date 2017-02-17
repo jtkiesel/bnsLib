@@ -11,15 +11,13 @@
  * @return	Next character.
  */
 unsigned char getNextChar(TUARTs port) {
-	short c = getChar(port);
+	short c;
 
 	// Wait for valid character.
-	while (c == -1) {
+	while ((c = getChar(port)) == -1) {
 		sleep(3);
-
-		c = getChar(port);
 	}
-	return (unsigned char)c;
+	return c;
 }
 
 /**
@@ -31,11 +29,7 @@ unsigned char getNextChar(TUARTs port) {
  */
 unsigned short getNextWord(TUARTs port) {
 	// This routine assumes little-endian.
-	unsigned char c = getNextChar(port);
-	unsigned short w = getNextChar(port);
-	w <<= 8;
-	w |= c;
-	return w;
+	return getNextChar(port) | ((unsigned short)getNextChar(port) << 8);
 }
 
 /**

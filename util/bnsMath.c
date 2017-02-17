@@ -63,6 +63,17 @@ float boundAngleNegPiToPiRadians(float angle) {
 	return angle;
 }
 
+float boundAngleNeg180To180Degrees(float angle) {
+	// Naive algorithm.
+	while (angle >= 180.0) {
+		angle -= 360.0;
+	}
+	while (angle < -180.0) {
+		angle += 360.0;
+	}
+	return angle;
+}
+
 /**
  * Get the difference in angle between two angles.
  *
@@ -74,6 +85,19 @@ float boundAngleNegPiToPiRadians(float angle) {
  */
 float getDifferenceInAngleRadians(float from, float to) {
 	return boundAngleNegPiToPiRadians(to - from);
+}
+
+/**
+ * Get the difference in angle between two angles.
+ *
+ * @param 	from	The first angle.
+ * @param 	to  	The second angle.
+ *
+ * @return	The change in angle from the first argument necessary to line up
+ *        	with the second. Always between -180 and 180.
+ */
+float getDifferenceInAngleDegrees(float from, float to) {
+	return boundAngleNeg180To180Degrees(to - from);
 }
 
 /**
