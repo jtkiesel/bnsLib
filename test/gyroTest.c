@@ -5,6 +5,8 @@ Gyro gyro;
 task background() {
 	while (true) {
 		update(&gyro);
+
+		sleep(1);
 	}
 }
 
