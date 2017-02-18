@@ -100,15 +100,15 @@ void setScale(Gyro *this, float scale) {
 }
 
 void calibrate(Gyro *this, int samples, long delay) {
-    if (this == NULL) {
-        return;
-    }
-    int sum = 0;
-    for (int i = 0; i < samples; i++) {
+	if (this == NULL) {
+		return;
+	}
+	int sum = 0;
+	for (int i = 0; i < samples; i++) {
 		sum += SensorValue[this->port];
 
 		sleep(delay);
-    }
+	}
 	this->bias = (float)sum / samples;
 }
 
