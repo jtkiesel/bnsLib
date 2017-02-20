@@ -3,6 +3,8 @@
 #if !defined(ENCODERWHEEL_C_)
 #define ENCODERWHEEL_C_
 
+#include "../util/bnsString.c"
+
 typedef struct {
 	tSensors port;
 	float pulsesPerRev;
@@ -70,7 +72,6 @@ void setPort(EncoderWheel *this, tSensors port) {
 	if (this) {
 		this->port = port;
 	}
-	return this;
 }
 
 float getPulsesPerRev(EncoderWheel *this) {
@@ -81,7 +82,6 @@ void setPulsesPerRev(EncoderWheel *this, float pulsesPerRev) {
 	if (this) {
 		this->pulsesPerRev = pulsesPerRev;
 	}
-	return this;
 }
 
 float getWheelDiameter(EncoderWheel *this) {
@@ -92,7 +92,6 @@ void setWheelDiameter(EncoderWheel *this, float wheelDiameter) {
 	if (this) {
 		this->wheelDiameter = wheelDiameter;
 	}
-	return this;
 }
 
 float getGearRatio(EncoderWheel *this) {
@@ -103,7 +102,6 @@ void setGearRatio(EncoderWheel *this, float gearRatio) {
 	if (this) {
 		this->gearRatio = gearRatio;
 	}
-	return this;
 }
 
 float getSlipFactor(EncoderWheel *this) {
@@ -114,7 +112,6 @@ void setSlipFactor(EncoderWheel *this, float slipFactor) {
 	if (this) {
 		this->slipFactor = slipFactor;
 	}
-	return this;
 }
 
 bool getInverted(EncoderWheel *this) {
@@ -125,7 +122,6 @@ void setInverted(EncoderWheel *this, bool inverted) {
 	if (this) {
 		this->inverted = inverted;
 	}
-	return this;
 }
 
 long getPulses(EncoderWheel *this) {
@@ -145,33 +141,15 @@ float getDistance(EncoderWheel *this) {
 
 void print(EncoderWheel *this) {
 	if (this == NULL) {
-		return NULL;
+		return;
 	}
-	char *portString;
-	char *invertedString;
-	tSensors port = this->port;
-
-	if (port >= in1 && port <= in8) {
-		portString = "in";
-		port -= in1 - 1;
-	} else if (port >= dgtl1 && port <= dgtl12) {
-		portString = "dgtl";
-		port -= dgtl1 - 1;
-	} else if (port >= I2C_1 && port <= I2C_8) {
-		portString = "I2C_";
-		port -= I2C_1 - 1;
-	}
-	invertedString = this->inverted ? "true" : "false";
-
-	writeDebugStream("Port: %s%d\n", portString, port);
+	writeDebugStream("Port: %s\n", toString(this->port));
 	writeDebugStream("Pulses Per Rev: %f\n", this->pulsesPerRev);
 	writeDebugStream("Wheel Diameter: %f\n", this->wheelDiameter);
 	writeDebugStream("Gear Ratio: %f\n", this->gearRatio);
 	writeDebugStream("Slip Factor: %f\n", this->slipFactor);
-	writeDebugStream("Inverted: %s\n", invertedString);
+	writeDebugStream("Inverted: %s\n", toString(this->inverted));
 	writeDebugStream("Distance: %f\n", getDistance(this));
-
-	return this;
 }
 
 #endif  // ENCODERWHEEL_C_

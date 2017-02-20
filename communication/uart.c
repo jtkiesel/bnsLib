@@ -44,8 +44,7 @@ unsigned short getNextWord(TUARTs port) {
 short sendChars(TUARTs port, unsigned char *data, short len) {
 	for (short i = 0; i < len; i++) {
 		// Wait for transmit buffer to be empty or timeout.
-		short timeout = 0;
-		while (!bXmitComplete(port) && timeout++ < 20) {
+		for (short timeout = 0; !bXmitComplete(port) && timeout < 20; timeout++) {
 		}
 		sendChar(port, data[i]);
 	}

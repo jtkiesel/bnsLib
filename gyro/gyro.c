@@ -3,6 +3,9 @@
 #if !defined(GYRO_C_)
 #define GYRO_C_
 
+#include "../util/bnsMath.c"
+#include "../util/bnsString.c"
+
 typedef struct {
 	tSensors port;
 	float angle;
@@ -56,12 +59,9 @@ float getAngle(Gyro *this) {
 
 void setAngle(Gyro *this, float angle) {
 	if (this) {
-		while (angle < 0.0 || angle >= 360.0) {
-			angle -= sgn(angle) * 360.0;
-		}
 		semaphoreLock(this->sem);
 
-		this->angle = angle;
+		this->angle = boundAngle0To360Degrees(angle);
 
 		if (bDoesTaskOwnSemaphore(this->sem)) {
 			semaphoreUnlock(this->sem);
@@ -112,14 +112,14 @@ void calibrate(Gyro *this, int samples, long delay) {
 	this->bias = (float)sum / samples;
 }
 
-float update(Gyro *this) {
+void update(Gyro *this) {
 	if (this == NULL) {
-		return NULL;
+		return;
 	}
 	if (this->time == NULL) {
 		this->time = nSysTime;
 
-		return this->angle;
+		return;
 	}
 	long dt = nSysTime - this->time;
 	float da = SensorValue[this->port] - this->bias;
@@ -127,12 +127,7 @@ float update(Gyro *this) {
 	if (fabs(da) > this->deadzone) {
 		semaphoreLock(this->sem);
 
-		float angle = this->angle + (da / this->scale) * dt;
-
-		if (angle < 0.0 || angle >= 360.0) {
-			angle -= sgn(angle) * 360.0;
-		}
-		this->angle = angle;
+		this->angle = boundAngle0To360Degrees(this->angle + (da / this->scale) * dt);
 
 		if (bDoesTaskOwnSemaphore(this->sem)) {
 			semaphoreUnlock(this->sem);
@@ -140,7 +135,18 @@ float update(Gyro *this) {
 	}
 	this->time += dt;
 
-	return this->angle;
+	return;
+}
+
+void print(Gyro *this) {
+	if (this == NULL) {
+		retun NULL;
+	}
+	writeDebugStream("Port: %s\n", toString(this->port));
+	writeDebugStream("Angle: %f\n", this->angle);
+	writeDebugStream("Bias: %f\n", this->bias);
+	writeDebugStream("Deadzone: %f\n", this->deadzone);
+	writeDebugStream("Scale: %f\n", this->scale);
 }
 
 #endif  // GYRO_C_

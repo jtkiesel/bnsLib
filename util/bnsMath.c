@@ -41,7 +41,7 @@ float degreesToRadians(float angdeg) {
 	return angdeg / 180.0 * PI;
 }
 
-float boundAngle0to2PiRadians(float angle) {
+float boundAngle0To2PiRadians(float angle) {
 	// Naive algorithm.
 	while (angle >= 2.0 * PI) {
 		angle -= 2.0 * PI;
@@ -59,6 +59,17 @@ float boundAngleNegPiToPiRadians(float angle) {
 	}
 	while (angle < -PI) {
 		angle += 2.0 * PI;
+	}
+	return angle;
+}
+
+float boundAngle0To360Degrees(float angle) {
+	// Naive algorithm.
+	while (angle >= 360.0) {
+		angle -= 360.0;
+	}
+	while (angle < 0.0) {
+		angle += 360.0;
 	}
 	return angle;
 }
