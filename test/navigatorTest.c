@@ -24,7 +24,7 @@ task main() {
 	float x, y, heading;
 
 	while (true) {
-		updateNavigator(&navigator);
+		update(&navigator);
 
 		x = getX(&navigator);
 		y = getY(&navigator);

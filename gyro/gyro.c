@@ -99,12 +99,12 @@ void setScale(Gyro *this, float scale) {
 	}
 }
 
-void calibrate(Gyro *this, int samples, long delay) {
+void calibrate(Gyro *this, short samples, long delay) {
 	if (this == NULL) {
 		return;
 	}
 	int sum = 0;
-	for (int i = 0; i < samples; i++) {
+	for (short i = 0; i < samples; i++) {
 		sum += SensorValue[this->port];
 
 		sleep(delay);
@@ -140,7 +140,7 @@ void update(Gyro *this) {
 
 void print(Gyro *this) {
 	if (this == NULL) {
-		retun NULL;
+		return;
 	}
 	writeDebugStream("Port: %s\n", toString(this->port));
 	writeDebugStream("Angle: %f\n", this->angle);

@@ -151,7 +151,7 @@ void setHeading(Navigator *this, float heading) {
 	if (this) {
 		semaphoreLock(this->sem);
 
-		this->heading = boundAngle0to2PiRadians(heading);
+		this->heading = boundAngle0To2PiRadians(heading);
 
 		if (bDoesTaskOwnSemaphore(this->sem)) {
 			semaphoreUnlock(this->sem);
@@ -175,7 +175,7 @@ void update(Navigator *this) {
 
 	this->x += magnitude * sin(tempHeading) + diffM * cos(tempHeading);
 	this->y += magnitude * cos(tempHeading) + diffM * sin(tempHeading);
-	this->heading = boundAngle0to2PiRadians(this->heading + diffH);
+	this->heading = boundAngle0To2PiRadians(this->heading + diffH);
 
 	if (bDoesTaskOwnSemaphore(this->sem)) {
 		semaphoreUnlock(this->sem);

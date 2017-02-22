@@ -28,7 +28,9 @@ void testSetServos(Pixy *this) {
 
 void testPrint(Pixy *this) {
 	while (true) {
-		print(update(this));
+		update(this);
+		print(this);
+
 		sleep(200);
 	}
 }

@@ -1,5 +1,4 @@
 #include "../gyro/gyro.c"
-#include "../util/bnsMath.c"
 
 Gyro gyro;
 

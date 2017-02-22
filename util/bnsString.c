@@ -24,13 +24,13 @@ char *toString(tSensors port) {
 	char str[7];
 
 	if (port >= in1 && port <= in8) {
-		portType = "in";
+		sprintf(portType, "in");
 		portNumber -= (short)in1;
 	} else if (port >= dgtl1 && port <= dgtl12) {
-		portType = "dgtl";
+		sprintf(portType, "dgtl");
 		portNumber -= (short)dgtl1;
 	} else if (port >= I2C_1 && port <= I2C_8) {
-		portType = "I2C_";
+		sprintf(portType, "I2C_");
 		portNumber -= (short)I2C_1;
 	} else {
 		return "";

@@ -67,16 +67,14 @@ Spline *newSpline(Spline *this, Waypoint *beginning, Waypoint *end) {
 			end->y, end->theta);
 }
 
-Spline *print(Spline *this) {
+void print(Spline *this) {
 	if (this == NULL) {
-		return NULL;
+		return;
 	}
 	writeDebugStream("a=%f; b=%f; c=%f; d=%f; e=%f\n", this->a, this->b,
 			this->c, this->d, this->e);
 	writeDebugStream("xOffset=%f; yOffset=%f; thetaOffset=%f\n", this->xOffset,
 			this->yOffset, this->thetaOffset);
-
-	return this;
 }
 
 task main() {

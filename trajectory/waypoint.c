@@ -39,53 +39,49 @@ float getX(Waypoint *this) {
 	return this ? this->x : 0.0;
 }
 
-Waypoint *setX(Waypoint *this, float x) {
+void setX(Waypoint *this, float x) {
 	if (this) {
 		this->x = x;
 	}
-	return this;
 }
 
 float getY(Waypoint *this) {
 	return this ? this->y : 0.0;
 }
 
-Waypoint *setY(Waypoint *this, float y) {
+void setY(Waypoint *this, float y) {
 	if (this) {
 		this->y = y;
 	}
-	return this;
 }
 
 float getTheta(Waypoint *this) {
 	return this ? this->theta : 0.0;
 }
 
-Waypoint *setTheta(Waypoint *this, float theta) {
+void setTheta(Waypoint *this, float theta) {
 	if (this) {
 		this->theta = theta;
 	}
-	return this;
 }
 
 Waypoint *getNext(Waypoint *this) {
 	return this ? this->next : NULL;
 }
 
-Waypoint *setNext(Waypoint *this, Waypoint *next) {
+void setNext(Waypoint *this, Waypoint *next) {
 	if (this) {
 		this->next = next;
 	}
-	return this;
 }
 
-Waypoint *print(Waypoint *this) {
-	if (this) {
-		writeDebugStream("x: %f\n", this->x);
-		writeDebugStream("y: %f\n", this->y);
-		writeDebugStream("theta: %f\n", this->theta);
+void print(Waypoint *this) {
+	if (this == NULL) {
+		return;
 	}
-	return this;
+	writeDebugStream("x: %f\n", this->x);
+	writeDebugStream("y: %f\n", this->y);
+	writeDebugStream("theta: %f\n", this->theta);
 }
 
 #endif  // WAYPOINT_C_

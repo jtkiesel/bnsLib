@@ -20,16 +20,18 @@ WaypointSequence *newWaypointSequence(WaypointSequence *this, Waypoint *head,
 }
 
 WaypointSequence *newWaypointSequence(WaypointSequence *this, Waypoint *head) {
-	if (this || head) {
-		Waypoint *current = head;
-
-		// Find tail.
-		while (current->next) {
-			current = current->next;
-		}
-		this->head = head;
-		this->tail = current;
+	if (this == NULL || head == NULL) {
+		return NULL;
 	}
+	Waypoint *current = head;
+
+	// Find tail.
+	while (current->next) {
+		current = current->next;
+	}
+	this->head = head;
+	this->tail = current;
+
 	return this;
 }
 /*
