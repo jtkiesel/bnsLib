@@ -76,7 +76,7 @@ float update(TrapezoidalProfile *this, float error, float t) {
 	// If it is time to decelerate (use v1 in place of v0 to decelerate).
 	// ds = (v^2 - v0^2) / (2*a) derived from v^2 = v0^2 + 2*a*ds.
 	if (error <= (pow(v, 2.0) - pow(this->v1, 2.0)) / (2.0 * this->maxAcc)) {
-		// Find velocity based on error (deceleration).
+		// Find target velocity based on error (deceleration).
 		// v = sqrt(v0^2 + 2*a*ds) derived from v^2 = v0^2 + 2*a*ds.
 		v = sgn(this->maxAcc * error)
 				* sqrt(fabs(pow(this->v1, 2.0) + 2 * this->maxAcc * error));

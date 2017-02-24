@@ -3,8 +3,8 @@
 #if !defined(GYRO_C_)
 #define GYRO_C_
 
-#include "../util/bnsMath.c"
-#include "../util/bnsString.c"
+#include "../util/math.c"
+#include "../util/string.c"
 
 typedef struct {
 	tSensors port;
@@ -24,7 +24,7 @@ Gyro *newGyro(Gyro *this, tSensors port, float angle) {
 		this->port = port;
 		this->angle = angle;
 
-		this->bias = 1869.8;  // Should be 1.5V * 1.511 * (2 / 3) * (4095 / 3.3V) = 1875.01363636... .
+		this->bias = 1869.8;   // Should be 1.5V * 1.511 * (2 / 3) * (4095 / 3.3V) = 1875.01363636... .
 		this->deadzone = 3.0;  // Should be ~1.0.
 		this->scale = 1330.0;  // Should be 11V/deg/ms * 1.511 * (2 / 3) * (4095 / 3.3V) = 1375.01/deg/ms.
 
@@ -134,8 +134,6 @@ void update(Gyro *this) {
 		}
 	}
 	this->time += dt;
-
-	return;
 }
 
 void print(Gyro *this) {

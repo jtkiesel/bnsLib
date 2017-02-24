@@ -3,7 +3,7 @@
 #if !defined(ENCODERWHEEL_C_)
 #define ENCODERWHEEL_C_
 
-#include "../util/bnsString.c"
+#include "../util/string.c"
 
 typedef struct {
 	tSensors port;
@@ -125,18 +125,12 @@ void setInverted(EncoderWheel *this, bool inverted) {
 }
 
 long getPulses(EncoderWheel *this) {
-	if (this == NULL) {
-		return 0;
-	}
-	return (this->inverted ? -1 : 1) * SensorValue[this->port];
+	return this ? (this->inverted ? -1 : 1) * SensorValue[this->port] : 0;
 }
 
 float getDistance(EncoderWheel *this) {
-	if (this == NULL) {
-		return 0.0;
-	}
-	return (getPulses(this) * PI * this->wheelDiameter)
-			/ (this->pulsesPerRev * this->gearRatio * this->slipFactor);
+	return this ? (getPulses(this) * PI * this->wheelDiameter)
+			/ (this->pulsesPerRev * this->gearRatio * this->slipFactor) : 0.0;
 }
 
 void print(EncoderWheel *this) {

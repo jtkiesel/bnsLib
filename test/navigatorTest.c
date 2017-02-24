@@ -30,6 +30,6 @@ task main() {
 		y = getY(&navigator);
 		heading = getHeading(&navigator);
 
-		sleep(10);
+		sleep(15);
 	}
 }

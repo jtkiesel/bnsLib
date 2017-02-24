@@ -14,10 +14,10 @@ unsigned char getNextChar(TUARTs port) {
 	short c;
 
 	// Wait for valid character.
-	while ((c = getChar(port)) == -1) {
+	while ((c = getChar(port)) < 0) {
 		sleep(3);
 	}
-	return c;
+	return (unsigned char)c;
 }
 
 /**

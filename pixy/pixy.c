@@ -55,12 +55,13 @@ typedef struct {
  * @return	Pointer to Pixy struct.
  */
 Pixy *newPixy(Pixy *this, TUARTs port, TBaudRate baudRate) {
-	setBaudRate(port, baudRate);
-	
-	this->port = port;
-	this->skipStart = false;
-	this->blockCount = 0;
-	
+	if (this) {
+		setBaudRate(port, baudRate);
+
+		this->port = port;
+		this->skipStart = false;
+		this->blockCount = 0;
+	}
 	return this;
 }
 
@@ -77,20 +78,39 @@ Pixy *newPixy(Pixy *this, TUARTs port) {
 }
 
 /**
- * Get start word from Pixy.
+ * Initialize Pixy.
  *
  * @param 	this	Pointer to Pixy struct.
  *
  * @return	Pointer to Pixy struct.
  */
+Pixy *newPixy(Pixy *this) {
+	if (this) {
+		this->port = (TUARTs)-1;
+		this->skipStart = false;
+		this->blockCount = 0;
+	}
+	return this;
+}
+
+/**
+ * Get start word from Pixy.
+ *
+ * @param 	this	Pointer to Pixy struct.
+ *
+ * @return	true if start code found, false otherwise.
+ */
 bool getPixyStart(Pixy *this) {
+	if (this == NULL) {
+		return false;
+	}
 	TUARTs port = this->port;
-	unsigned short w, lastW = 0xffff;  // Some inconsequential initial value.
+	unsigned short lastW = 0xffff;  // Some inconsequential initial value.
+	unsigned short w;
 
 	while (true) {
 		w = getNextWord(port);
 		if (w == 0 && lastW == 0) {
-			sleep(10);
 			return false;  // No start code.
 		} else if (w == PIXY_START_WORD && lastW == PIXY_START_WORD) {
 			this->blockType = NORMAL_BLOCK;
@@ -98,9 +118,8 @@ bool getPixyStart(Pixy *this) {
 		} else if (w == PIXY_START_WORD_CC && lastW == PIXY_START_WORD_CC) {
 			this->blockType = CC_BLOCK;  // Found color code block.
 			return true;
-		} else if (w == PIXY_START_WORDX) {  // We're out of sync (backwards)!
-			writeDebugStream("Reorder.\n");
-			getChar(port);  // Resync.
+		} else if (w == PIXY_START_WORDX) {  // This is important, we might be juxtaposed.
+			getChar(port);  // We're out of sync (backwards)!
 		}
 		lastW = w;
 	}
@@ -114,8 +133,12 @@ bool getPixyStart(Pixy *this) {
  * @return	Number of blocks found.
  */
 unsigned short update(Pixy *this) {
+	if (this == NULL) {
+		return 0;
+	}
 	TUARTs port = this->port;
-	unsigned short w, blockCount = 0, checksum, sum;
+	unsigned short blockCount = 0;
+	unsigned short w, checksum, sum;
 	PixyBlock *block;
 
 	if (!this->skipStart) {
@@ -145,36 +168,30 @@ unsigned short update(Pixy *this) {
 		}
 		block = &this->blocks[blockCount];
 
-		w = getNextWord(port);
+		block->signature = w = getNextWord(port);
 		sum = w;
-		block->signature = w;
 
-		w = getNextWord(port);
+		block->x = w = getNextWord(port);
 		sum += w;
-		block->x = w;
 
-		w = getNextWord(port);
+		block->y = w = getNextWord(port);
 		sum += w;
-		block->y = w;
 
-		w = getNextWord(port);
+		block->width = w = getNextWord(port);
 		sum += w;
-		block->width = w;
 
-		w = getNextWord(port);
+		block->height = w = getNextWord(port);
 		sum += w;
-		block->height = w;
 
 		// No angle for regular block.
-		w = (this->blockType == NORMAL_BLOCK) ? 0 : getNextWord(port);
+		block->angle = w = (this->blockType == NORMAL_BLOCK) ? 0 : getNextWord(port);
 		sum += w;
-		block->angle = w;
 
 		// Check checksum.
 		if (checksum == sum) {
 			blockCount++;
 		} else {
-			writeDebugStream("Checksum error!\n");
+			writeDebugStream("Pixy update checksum error!\n");
 		}
 		w = getNextWord(port);
 		if (w == PIXY_START_WORD) {
@@ -197,7 +214,7 @@ unsigned short update(Pixy *this) {
  * @return	Number of blocks.
  */
 unsigned short getBlockCount(Pixy *this) {
-	return this->blockCount;
+	return this ? this->blockCount : 0;
 }
 
 /**
@@ -209,11 +226,10 @@ unsigned short getBlockCount(Pixy *this) {
  * @return	Number of characters sent via sendChars().
  */
 short setBrightness(Pixy *this, unsigned char brightness) {
-	unsigned char outBuf[3];
-
-	outBuf[0] = 0x00;
-	outBuf[1] = 0xfe;
-	outBuf[2] = brightness;
+	if (this == NULL) {
+		return 0;
+	}
+	unsigned char outBuf[3] = {0x00, 0xfe, brightness};
 
 	return sendChars(this->port, outBuf, sizeof(outBuf) / sizeof(outBuf[0]));
 }
@@ -229,6 +245,9 @@ short setBrightness(Pixy *this, unsigned char brightness) {
  * @return	Number of characters sent via sendChars().
  */
 short setLED(Pixy *this, unsigned char r, unsigned char g, unsigned char b) {
+	if (this == NULL) {
+		return 0;
+	}
 	unsigned char outBuf[5] = {0x00, 0xfd, r, g, b};
 
 	return sendChars(this->port, outBuf, sizeof(outBuf) / sizeof(outBuf[0]));
@@ -244,6 +263,9 @@ short setLED(Pixy *this, unsigned char r, unsigned char g, unsigned char b) {
  * @return	Number of characters sent via sendChars().
  */
 short setServos(Pixy *this, unsigned short s0, unsigned short s1) {
+	if (this == NULL) {
+		return 0;
+	}
 	unsigned char outBuf[6];
 
 	outBuf[0] = 0x00;
@@ -255,11 +277,14 @@ short setServos(Pixy *this, unsigned short s0, unsigned short s1) {
 }
 
 /**
- * Print Pixy block data to debug stream.
+ * Print single Pixy block data to debug stream.
  *
- * @param 	this	Pointer to Pixy block struct.
+ * @param 	this	Pointer to PixyBlock struct.
  */
 void print(PixyBlock *this) {
+	if (this == NULL) {
+		return;
+	}
 	unsigned short signature = this->signature;
 
 	if (signature > PIXY_MAX_SIGNATURE) {  // Color code (CC)!
@@ -273,11 +298,14 @@ void print(PixyBlock *this) {
 }
 
 /**
- * Print Pixy block data to debug stream.
+ * Print all Pixy block data to debug stream.
  *
  * @param 	this	Pointer to Pixy struct.
  */
 void print(Pixy *this) {
+	if (this == NULL) {
+		return;
+	}
 	unsigned short blockCount = this->blockCount;
 
 	writeDebugStream("Detected %d:\n", blockCount);

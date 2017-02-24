@@ -3,7 +3,7 @@
 #if !defined(NAVIGATOR_C_)
 #define NAVIGATOR_C_
 
-#include "../util/bnsMath.c"
+#include "../util/math.c"
 #include "../components/encoderWheel.c"
 
 typedef struct {
@@ -77,7 +77,14 @@ EncoderWheel *getLeftEncoder(Navigator *this) {
 
 void setLeftEncoder(Navigator *this, EncoderWheel *leftEncoder) {
 	if (this) {
+		semaphoreLock(this->sem);
+
 		this->leftEncoder = leftEncoder;
+		this->lastL = getDistance(leftEncoder);
+
+		if (bDoesTaskOwnSemaphore(this->sem)) {
+			semaphoreUnlock(this->sem);
+		}
 	}
 }
 
@@ -87,7 +94,14 @@ EncoderWheel *getRightEncoder(Navigator *this) {
 
 void setRightEncoder(Navigator *this, EncoderWheel *rightEncoder) {
 	if (this) {
+		semaphoreLock(this->sem);
+
 		this->rightEncoder = rightEncoder;
+		this->lastR = getDistance(rightEncoder);
+
+		if (bDoesTaskOwnSemaphore(this->sem)) {
+			semaphoreUnlock(this->sem);
+		}
 	}
 }
 
@@ -97,7 +111,14 @@ EncoderWheel *getMiddleEncoder(Navigator *this) {
 
 void setMiddleEncoder(Navigator *this, EncoderWheel *middleEncoder) {
 	if (this) {
+		semaphoreLock(this->sem);
+
 		this->middleEncoder = middleEncoder;
+		this->lastM = getDistance(middleEncoder);
+
+		if (bDoesTaskOwnSemaphore(this->sem)) {
+			semaphoreUnlock(this->sem);
+		}
 	}
 }
 
@@ -163,26 +184,26 @@ void update(Navigator *this) {
 	if (this == NULL) {
 		return;
 	}
+	semaphoreLock(this->sem);
+
 	float diffL = getDistance(this->leftEncoder) - this->lastL;
 	float diffR = getDistance(this->rightEncoder) - this->lastR;
 	float diffM = getDistance(this->middleEncoder) - this->lastM;
 
-	float diffH = (diffR - diffL) / this->driveWidth;
-	float tempHeading = this->heading + diffH / 2.0;
-	float magnitude = (diffL + diffR) / 2.0;
-
-	semaphoreLock(this->sem);
-
-	this->x += magnitude * sin(tempHeading) + diffM * cos(tempHeading);
-	this->y += magnitude * cos(tempHeading) + diffM * sin(tempHeading);
-	this->heading = boundAngle0To2PiRadians(this->heading + diffH);
+	this->lastL += diffL;
+	this->lastR += diffR;
+	this->lastM += diffM;
 
 	if (bDoesTaskOwnSemaphore(this->sem)) {
 		semaphoreUnlock(this->sem);
 	}
-	this->lastL += diffL;
-	this->lastR += diffR;
-	this->lastM += diffM;
+	float diffH = (diffR - diffL) / this->driveWidth;
+	float tempHeading = this->heading + diffH / 2.0;
+	float magnitude = (diffL + diffR) / 2.0;
+
+	this->x += magnitude * sin(tempHeading) + diffM * cos(tempHeading);
+	this->y += magnitude * cos(tempHeading) + diffM * sin(tempHeading);
+	this->heading = boundAngle0To2PiRadians(this->heading + diffH);
 }
 
 void print(Navigator *this) {

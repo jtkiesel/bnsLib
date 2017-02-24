@@ -3,7 +3,7 @@
 #if !defined(SPLINE_C_)
 #define SPLINE_C_
 
-#include "../util/bnsMath.c"
+#include "../util/math.c"
 #include "./waypoint.c"
 
 typedef struct {
