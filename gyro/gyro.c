@@ -99,17 +99,24 @@ void setScale(Gyro *this, float scale) {
 	}
 }
 
-void calibrate(Gyro *this, short samples, long delay) {
-	if (this == NULL) {
-		return;
-	}
+float calibrateBias(tSensors port, short samples, long delay) {
 	int sum = 0;
 	for (short i = 0; i < samples; i++) {
-		sum += SensorValue[this->port];
+		sum += SensorValue[port];
 
 		sleep(delay);
 	}
-	this->bias = (float)sum / samples;
+	return (float)sum / samples;
+}
+
+void calibrate(Gyro *this, short samples, long delay) {
+	if (this) {
+		this->bias = calibrateBias(this->port, samples, delay);
+	}
+}
+
+void calibrate(Gyro *this) {
+	calibrate(this, 1000, 1);
 }
 
 void update(Gyro *this) {
