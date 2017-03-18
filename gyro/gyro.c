@@ -28,7 +28,7 @@ Gyro *newGyro(Gyro *this, tSensors port, float angle) {
 		this->deadzone = 3.0;  // Should be ~1.0.
 		this->scale = 1330.0;  // Should be 11V/deg/ms * 1.511 * (2 / 3) * (4095 / 3.3V) = 1375.01/deg/ms.
 
-		this->time = NULL;
+		this->time = 0;
 
 		semaphoreInitialize(this->sem);
 
@@ -123,7 +123,7 @@ void update(Gyro *this) {
 	if (this == NULL) {
 		return;
 	}
-	if (this->time == NULL) {
+	if (this->time == 0) {
 		this->time = nSysTime;
 
 		return;
