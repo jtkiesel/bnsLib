@@ -30,8 +30,11 @@ Gyro *newGyro(Gyro *this, tSensors port, float angle) {
 		this->deadzone = 3.0;  // Should be ~1.0.
 		this->scale = 1330.0;  // Should be 11V/deg/ms * 1.511 * (2 / 3) * (4095 / 3.3V) = 1375.01/deg/ms.
 
+<<<<<<< HEAD
 		this->burstSize = 20;
 
+=======
+>>>>>>> 375f671793926bb02293e678b3b26cb199b89680
 		this->time = 0;
 
 		semaphoreInitialize(this->sem);
