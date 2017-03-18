@@ -14,7 +14,9 @@ typedef struct {
 	float deadzone;
 	float scale;
 
-	long time;
+	unsigned short burstSize;
+
+	unsigned long time;
 
 	TSemaphore sem;
 } Gyro;
@@ -28,7 +30,9 @@ Gyro *newGyro(Gyro *this, tSensors port, float angle) {
 		this->deadzone = 3.0;  // Should be ~1.0.
 		this->scale = 1330.0;  // Should be 11V/deg/ms * 1.511 * (2 / 3) * (4095 / 3.3V) = 1375.01/deg/ms.
 
-		this->time = NULL;
+		this->burstSize = 20;
+
+		this->time = 0;
 
 		semaphoreInitialize(this->sem);
 
@@ -99,20 +103,25 @@ void setScale(Gyro *this, float scale) {
 	}
 }
 
-float calibrateBias(tSensors port, short samples, long delay) {
-	int sum = 0;
-	for (short i = 0; i < samples; i++) {
+float getAvgAnalog(tSensors port, unsigned short samples) {
+	unsigned int sum = 0;
+	for (unsigned short i = 0; i < samples; i++) {
 		sum += SensorValue[port];
-
-		sleep(delay);
 	}
 	return (float)sum / samples;
 }
 
-void calibrate(Gyro *this, short samples, long delay) {
-	if (this) {
-		this->bias = calibrateBias(this->port, samples, delay);
+void calibrate(Gyro *this, unsigned short samples, unsigned long delay) {
+	if (this == NULL) {
+		return;
 	}
+	float sum = 0;
+	for (unsigned short i = 0; i < samples; i++) {
+		sum += getAvgAnalog(this->port, this->burstSize);//SensorValue[this->port];
+
+		sleep(delay);
+	}
+	this->bias = sum / samples;
 }
 
 void calibrate(Gyro *this) {
@@ -123,13 +132,13 @@ void update(Gyro *this) {
 	if (this == NULL) {
 		return;
 	}
-	if (this->time == NULL) {
+	if (this->time == 0) {
 		this->time = nSysTime;
 
 		return;
 	}
-	long dt = nSysTime - this->time;
-	float da = SensorValue[this->port] - this->bias;
+	unsigned long dt = nSysTime - this->time;
+	float da = getAvgAnalog(this->port, this->burstSize) - this->bias;//SensorValue[this->port] - this->bias;
 
 	if (fabs(da) > this->deadzone) {
 		semaphoreLock(this->sem);

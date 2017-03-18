@@ -10,7 +10,7 @@
 #define NUM_ANALOG_PORTS 8
 
 typedef struct {
-	short size;
+	unsigned short size;
 	tSensors ports[NUM_ANALOG_PORTS];
 
 	float biases[NUM_ANALOG_PORTS];
@@ -19,13 +19,13 @@ typedef struct {
 
 	float angle;
 
-	long time;
+	unsigned long time;
 
 	TSemaphore sem;
 } GyroArray;
 
 GyroArray *newGyroArray(GyroArray *this, tSensors *ports, unsigned short size, float angle) {
-	if (this && ports && size <= NUM_ANALOG_PORTS) {
+	if (this != NULL && ports != NULL && size <= NUM_ANALOG_PORTS) {
 		this->size = size;
 
 		for (unsigned short i = 0; i < NUM_ANALOG_PORTS; i++) {
@@ -60,17 +60,17 @@ GyroArray *newGyroArray(GyroArray *this) {
 }
 
 void addGyro(GyroArray *this, tSensors port) {
-	if (this && this->size < NUM_ANALOG_PORTS) {
+	if (this != NULL && this->size < NUM_ANALOG_PORTS) {
 		this->ports[this->size++] = port;
 	}
 }
 
 tSensors getPort(GyroArray *this, unsigned short index) {
-	return (this && index < NUM_ANALOG_PORTS) ? this->ports[index] : (tSensors)-1;
+	return (this != NULL && index < NUM_ANALOG_PORTS) ? this->ports[index] : (tSensors)-1;
 }
 
 void setPort(GyroArray *this, unsigned short index, tSensors port) {
-	if (this && index < this->size) {
+	if (this != NULL && index < this->size) {
 		this->ports[index] = port;
 		SensorType[port] = sensorAnalog;
 	}
@@ -93,21 +93,21 @@ void setAngle(GyroArray *this, float angle) {
 }
 
 float getBias(GyroArray *this, unsigned short index) {
-	return (this && index < this->size) ? this->biases[index] : 0.0;
+	return (this != NULL && index < this->size) ? this->biases[index] : 0.0;
 }
 
 void setBias(GyroArray *this, unsigned short index, float bias) {
-	if (this && index < this->size) {
+	if (this != NULL && index < this->size) {
 		this->biases[index] = bias;
 	}
 }
 
 float getScale(GyroArray *this, unsigned short index) {
-	return (this && index < this->size) ? this->scales[index] : 0.0;
+	return (this != NULL && index < this->size) ? this->scales[index] : 0.0;
 }
 
 void setScale(GyroArray *this, unsigned short index, float scale) {
-	if (this && index < this->size) {
+	if (this != NULL && index < this->size) {
 		this->scales[index] = scale;
 	}
 }
@@ -141,6 +141,10 @@ void calibrate(GyroArray *this, unsigned short samples, unsigned long delay) {
 	}
 }
 
+void calibrate(GyroArray *this) {
+	calibrate(this, 1000, 1);
+}
+
 void update(GyroArray *this) {
 	if (this == NULL) {
 		return;
@@ -150,13 +154,28 @@ void update(GyroArray *this) {
 
 		return;
 	}
-	long dt = nSysTime - this->time;
-	float da = SensorValue[this->port] - this->bias;
-
+	unsigned long dt = nSysTime - this->time;
+	float das[NUM_ANALOG_PORTS];
+	float sum = 0.0;
+	for (unsigned short i = 0; i < this->size; i++) {
+		sum += das[i] = SensorValue[this->ports[i]] - this->biases[i];
+	}
+	float diff01 = fabs(das[0] - das[1]);
+	float diff12 = fabs(das[1] - das[2]);
+	float diff20 = fabs(das[2] - das[0]);
+	float da;
+	if (diff01 < diff12 && diff01 < diff20) {
+		da = (das[0] + das[1]) / 2.0;
+	} else if (diff12 < diff01 && diff12 < diff20) {
+		da = (das[1] + das[2]) / 2.0;
+	} else {
+		da = (das[2] + das[0]) / 2.0;
+	}
+	//float da = sum / this->size;
 	if (fabs(da) > this->deadzone) {
 		semaphoreLock(this->sem);
 
-		this->angle = boundAngle0To360Degrees(this->angle + (da / this->scale) * dt);
+		this->angle = boundAngle0To360Degrees(this->angle + da * dt);
 
 		if (bDoesTaskOwnSemaphore(this->sem)) {
 			semaphoreUnlock(this->sem);
@@ -177,12 +196,12 @@ void print(GyroArray *this) {
 	writeDebugStream("Angle: %f\n", this->angle);
 	writeDebugStream("Biases: %f", this->biases[0]);
 	for (unsigned short i = 1; i < this->size; i++) {
-		writeDebugStream(", %f", this->biases[i]));
+		writeDebugStream(", %f", this->biases[i]);
 	}
 	writeDebugStream("\n");
-	writeDebugStream("Scales: %f", this->scales[i]);
+	writeDebugStream("Scales: %f", this->scales[0]);
 	for (unsigned short i = 1; i < this->size; i++) {
-		writeDebugStream(", %f", this->scales[i]));
+		writeDebugStream(", %f", this->scales[i]);
 	}
 	writeDebugStream("\n");
 	writeDebugStream("Deadzone: %f\n", this->deadzone);
