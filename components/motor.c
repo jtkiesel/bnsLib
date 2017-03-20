@@ -8,7 +8,7 @@ void motorSetLinear(tMotor port, short speed) {
 		return 0;
 	}
 	short x = abs(speed);
-	
+
 	if (x > 127) {
 		x = 127;
 	}
