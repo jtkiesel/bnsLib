@@ -72,7 +72,7 @@ void testVirtualPixy() {
 
 task main() {
 	Pixy pixy;
-	newPixy(&pixy, UART1);
+	newPixy(&pixy, UART1, baudRate19200);
 	testRealPixy(&pixy);
 
 //	testVirtualPixy();
