@@ -9,13 +9,13 @@ typedef struct {
 	float Kd;
 
 	float setpoint;
-	
+
 	long time;
 	float integral;
 	float error;
 
 	float controlVariable;
-	
+
 	TSemaphore sem;
 } Pid;
 
@@ -87,7 +87,7 @@ void setSetpoint(Pid *this, float setpoint) {
 
 void update(Pid *this, float processVariable) {
 	if (this == NULL) {
-		return 0.0;
+		return;
 	}
 	semaphoreLock(this->sem);
 
@@ -103,7 +103,7 @@ void update(Pid *this, float processVariable) {
 
 	float derivative = (dt == 0) ? 0.0 : ((error - this->error) / dt);
 
-	this->controlVariable = Kp * error + Ki * this->integral + Kd * derivative;
+	this->controlVariable = this->Kp * error + this->Ki * this->integral + this->Kd * derivative;
 
 	this->time += dt;
 	this->error = error;

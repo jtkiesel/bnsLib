@@ -266,12 +266,7 @@ short setServos(Pixy *this, unsigned short s0, unsigned short s1) {
 	if (this == NULL) {
 		return 0;
 	}
-	unsigned char outBuf[6];
-
-	outBuf[0] = 0x00;
-	outBuf[1] = 0xff;
-	outBuf[2] = s0;
-	outBuf[4] = s1;
+	unsigned char outBuf[6] = {0x00, 0xff, s0 & 0xff, s0 >> 8, s1 & 0xff, s1 >> 8};
 
 	return sendChars(this->port, outBuf, sizeof(outBuf) / sizeof(outBuf[0]));
 }

@@ -11,11 +11,12 @@
  * @return	Next character.
  */
 unsigned char getNextChar(TUARTs port) {
-	short c;
+	short c = getChar(port);
 
 	// Wait for valid character.
-	while ((c = getChar(port)) < 0) {
+	while (c < 0) {
 		sleep(3);
+		c = getChar(port);
 	}
 	return (unsigned char)c;
 }
@@ -30,6 +31,30 @@ unsigned char getNextChar(TUARTs port) {
 unsigned short getNextWord(TUARTs port) {
 	// This routine assumes little-endian.
 	return getNextChar(port) | ((unsigned short)getNextChar(port) << 8);
+}
+
+/**
+ * Get next word from UART port.
+ *
+ * @param 	port	UART port to get from.
+ *
+ * @return	Next word from UART port.
+ */
+short getNextSignedWord(TUARTs port) {
+	// This routine assumes little-endian.
+	return getNextChar(port) | ((short)getNextChar(port) << 8);
+}
+
+/**
+ * Get next int from UART port.
+ *
+ * @param 	port	UART port to get from.
+ *
+ * @return	Next int from UART port.
+ */
+int getNextSignedInt(TUARTs port) {
+	// This routine assumes little-endian.
+	return getNextWord(port) | ((int)getNextWord(port) << 16);
 }
 
 /**
@@ -49,6 +74,39 @@ short sendChars(TUARTs port, unsigned char *data, short len) {
 		sendChar(port, data[i]);
 	}
 	return len;
+}
+
+/**
+ * Send word to UART port.
+ *
+ * @param 	port	Port to send to.
+ * @param 	w   	Word to send.
+ */
+void sendWord(TUARTs port, unsigned short w) {
+	unsigned char data[2] = {w & 0xff, w >> 8};
+	sendChars(port, data, sizeof(data) / sizeof(data[0]));
+}
+
+/**
+ * Send word to UART port.
+ *
+ * @param 	port	Port to send to.
+ * @param 	w   	Word to send.
+ */
+void sendSignedWord(TUARTs port, short w) {
+	unsigned char data[2] = {w & 0xff, w >> 8};
+	sendChars(port, data, sizeof(data) / sizeof(data[0]));
+}
+
+/**
+ * Send int to UART port.
+ *
+ * @param 	port	Port to send to.
+ * @param 	i   	Int to send.
+ */
+void sendSignedInt(TUARTs port, int i) {
+	unsigned char data[4] = {i & 0xff, (i >> 8) & 0xff, (i >> 16) & 0xff, i >> 24};
+	sendChars(port, data, sizeof(data) / sizeof(data[0]));
 }
 
 #endif  // UART_C_
